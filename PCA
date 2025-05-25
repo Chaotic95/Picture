@@ -1,41 +1,64 @@
-library(ggplot2)
-library(RColorBrewer)
-library(readxl)
+# 安装并加载必要的包
+required_packages <- c("ggplot2", "RColorBrewer", "readxl", "isoband", "withr")
+missing_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
+if (length(missing_packages) > 0) {
+  install.packages(missing_packages)
+}
+lapply(required_packages, library, character.only = TRUE)
+
+# 设置工作目录
+setwd("C:/Users/86186/Desktop/水貂5.21/PCA")
+
 # 读取数据
-# 确定导入文件位置'C:/Users/86186/Desktop/PCA'和文件名字"PCA2.xlsx"
-setwd('C:/Users/86186/Desktop/PCA')
 data <- read_excel("PCA2.xlsx")
-# 检查数据结构，确保"sample"列包含貂颜色信息
+
+# 查看列名，确认分组列名称是否正确
+print(colnames(data))
+
+# 检查数据结构
 str(data)
 
-# 动态生成颜色（根据分组数量调整）
-num_groups <- length(unique(data$SAMPLE))
-colors <- colorRampPalette(brewer.pal(min(num_groups, 8), "Set2"))(num_groups)
-
-# 创建PCA图
-ggplot(data, aes(x = PC1, y = PC2, color = SAMPLE)) +
-  # 绘制散点图
-  geom_point(size = 4, alpha = 0.7) +
+# 获取唯一分组数（根据实际列名）
+if ("Sample" %in% colnames(data)) {  # 确保列名为 Sample
+  num_groups <- length(unique(data$Sample))
   
-  # 设置标签和主题title和color需要修改
-  labs(
-    x = "PC1",
-    y = "PC2",
-    title = "PCA Plot by Mink Color",
-    color = "Mink Color"
-  ) +
+  # 自定义颜色
+  colors <- colorRampPalette(brewer.pal(min(num_groups, 8), "Set2"))(num_groups)
   
-  # 主题设置（SCI论文风格）
-  theme_bw() +
-  theme(
-    legend.title = element_text(size = 12, face = "bold"),
-    legend.text = element_text(size = 10),
-    axis.title = element_text(size = 14, face = "bold"),
-    axis.text = element_text(size = 12),
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
-    panel.grid = element_blank(),
-    panel.border = element_rect(colour = "black", fill = NA, size = 1)
-  ) +
+  # 自定义形状
+  shapes <- c(16, 17, 15, 18, 3, 4, 8, 10)[seq_len(num_groups)]
   
-  # 设置颜色
-  scale_color_manual(values = colors)
+  # 创建 PCA 图
+  pca_plot <- ggplot(data, aes(x = PC1, y = PC2, color = Sample, shape = Sample)) +
+    geom_point(size = 2, alpha = 0.7) +
+    
+    labs(
+      x = "PC1",
+      y = "PC2",
+      title = "PCA Plot by Mink Color"
+    ) +
+    
+    theme_bw() +
+    theme(
+      legend.title = element_text(size = 12, face = "bold"),
+      legend.text = element_text(size = 10),
+      axis.title = element_text(size = 14, face = "bold"),
+      axis.text = element_text(size = 12),
+      plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+      panel.grid = element_blank(),
+      panel.border = element_rect(colour = "black", fill = NA, linewidth = 1),
+      axis.line = element_line(colour = "black", size = 0.5),
+      aspect.ratio = 1
+    ) +
+    
+    scale_color_manual(values = colors, name = "Mink Color") +  # 设置颜色图例名称
+    scale_shape_manual(values = shapes, guide = "none")  # 隐藏形状图例
+  
+  # 显示图形
+  print(pca_plot)
+  
+  # 导出高清图像用于论文或报告
+  ggsave("PCA_Mink_Color.pdf", plot = pca_plot, width = 10, height = 10, dpi = 300)
+} else {
+  stop("Data does not contain a column named 'Sample'. Please check your data.")
+}
