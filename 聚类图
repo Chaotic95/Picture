@@ -1,0 +1,195 @@
+# 安装并加载必要的库
+if (!requireNamespace("readxl", quietly = TRUE)) {
+  install.packages("readxl")
+}
+if (!requireNamespace("gplots", quietly = TRUE)) {
+  install.packages("gplots")
+}
+if (!requireNamespace("RColorBrewer", quietly = TRUE)) {
+  install.packages("RColorBrewer")
+}
+
+library(readxl)
+library(gplots)
+library(RColorBrewer)
+
+# 设置工作目录
+setwd("C:/Users/86186/Desktop/水貂GWAS")
+
+# 读取数据（默认为 tibble）
+data_raw <- read_excel("聚类图.xlsx", sheet = 1)
+
+# 将 tibble 转换为普通数据框
+data <- as.data.frame(data_raw)
+
+# 提取数据内容：去掉第八行（列名）和第一列（行名）
+numeric_data <- data[-8, -1]
+
+# 强制转换为数值矩阵
+numeric_matrix <- as.matrix(sapply(numeric_data, as.numeric))
+
+# 指定行名和列名
+rownames(numeric_matrix) <- c("SZ", "MH", "YL", "W", "KF", "H", "B") # 纵向命名
+colnames(numeric_matrix) <- c("B", "H", "KF", "W", "YL", "MH", "SZ") # 第八行作为横向命名（忽略第一个空）
+
+# 检查是否为数值矩阵
+str(numeric_matrix)
+
+# 设定颜色
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
+# 绘制聚类热图
+heatmap.2(numeric_matrix,
+          Rowv = TRUE, Colv = TRUE,
+          col = colors,
+          scale = "none",
+          margins = c(7, 7),
+          key = TRUE, keysize = 1.0,
+          density.info = "none",
+          reorderfun = function(d, w) reorder(d, w, agglo.FUN = mean),
+          trace = "none",
+          main = "聚类热图")
+
+
+
+
+
+# 安装并加载必要的库
+if (!requireNamespace("readxl", quietly = TRUE)) {
+  install.packages("readxl")
+}
+if (!requireNamespace("gplots", quietly = TRUE)) {
+  install.packages("gplots")
+}
+if (!requireNamespace("RColorBrewer", quietly = TRUE)) {
+  install.packages("RColorBrewer")
+}
+
+library(readxl)
+library(gplots)
+library(RColorBrewer)
+
+# 设置工作目录
+setwd("C:/Users/86186/Desktop/水貂GWAS")
+
+# 读取Excel文件
+data_raw <- read_excel("聚类图.xlsx", sheet = 1)
+
+# 将 tibble 转换为普通数据框
+data <- as.data.frame(data_raw)
+
+# 提取数值部分：去掉第8行（列名行），去掉第一列（行名列）
+numeric_data <- data[-8, -1]
+
+# 强制转换为数值型
+numeric_matrix <- as.matrix(sapply(numeric_data, as.numeric))
+
+# 检查是否有 NA / NaN / Inf
+if (any(is.na(numeric_matrix))) {
+  print("警告：数据中存在 NA，正在尝试填补 NA（使用 0 替代）")
+  numeric_matrix[is.na(numeric_matrix)] <- 0
+}
+
+if (any(is.nan(numeric_matrix))) {
+  print("警告：数据中存在 NaN，正在尝试填补 NaN（使用 0 替代）")
+  numeric_matrix[is.nan(numeric_matrix)] <- 0
+}
+
+if (any(is.infinite(numeric_matrix))) {
+  print("警告：数据中存在 Inf，正在尝试替换 Inf 为最大有限值")
+  numeric_matrix[is.infinite(numeric_matrix)] <- max(numeric_matrix[is.finite(numeric_matrix)], na.rm = TRUE)
+}
+
+# 设置行名和列名
+rownames_data <- c("SZ", "MH", "YL", "W", "KF", "H", "B")
+colnames_data <- c("B", "H", "KF", "W", "YL", "MH", "SZ")
+
+rownames(numeric_matrix) <- rownames_data
+colnames(numeric_matrix) <- colnames_data
+
+# 设定颜色
+colors <- colorRampPalette(c("blue", "red"))(255)
+
+# 绘制热图（关闭聚类测试可用性）
+heatmap.2(numeric_matrix,
+          Rowv = TRUE, Colv = TRUE,   # 可设为 FALSE 测试是否是聚类出错
+          col = colors,
+          scale = "none",
+          margins = c(7, 7),
+          key = TRUE, keysize = 1.0,
+          density.info = "none",
+          reorderfun = function(d, w) reorder(d, w, agglo.FUN = mean),
+          trace = "none",
+          main = "聚类热图")
+
+
+
+
+# 安装并加载必要的库
+if (!requireNamespace("readxl", quietly = TRUE)) {
+  install.packages("readxl")
+}
+if (!requireNamespace("gplots", quietly = TRUE)) {
+  install.packages("gplots")
+}
+if (!requireNamespace("RColorBrewer", quietly = TRUE)) {
+  install.packages("RColorBrewer")
+}
+
+library(readxl)
+library(gplots)
+library(RColorBrewer)
+
+# 设置工作目录
+setwd("C:/Users/86186/Desktop/水貂GWAS")
+
+# 读取Excel文件
+data_raw <- read_excel("聚类图.xlsx", sheet = 1)
+
+# 将 tibble 转换为普通数据框
+data <- as.data.frame(data_raw)
+
+# 提取数值部分：去掉第8行（列名行），去掉第一列（行名列）
+numeric_data <- data[-8, -1]
+
+# 强制转换为数值型
+numeric_matrix <- as.matrix(sapply(numeric_data, as.numeric))
+
+# 检查并处理NA、NaN或Inf值
+if (any(is.na(numeric_matrix))) {
+  print("警告：数据中存在 NA，正在尝试填补 NA（使用 0 替代）")
+  numeric_matrix[is.na(numeric_matrix)] <- 0
+}
+
+if (any(is.nan(numeric_matrix))) {
+  print("警告：数据中存在 NaN，正在尝试填补 NaN（使用 0 替代）")
+  numeric_matrix[is.nan(numeric_matrix)] <- 0
+}
+
+if (any(is.infinite(numeric_matrix))) {
+  print("警告：数据中存在 Inf，正在尝试替换 Inf 为最大有限值")
+  numeric_matrix[is.infinite(numeric_matrix)] <- max(numeric_matrix[is.finite(numeric_matrix)], na.rm = TRUE)
+}
+
+# 设置行名和列名
+rownames_data <- c("SZ", "MH", "YL", "W", "KF", "H", "B")
+colnames_data <- c("B", "H", "KF", "W", "YL", "MH", "SZ")
+
+rownames(numeric_matrix) <- rownames_data
+colnames(numeric_matrix) <- colnames_data
+
+# 设定红蓝颜色
+colors <- colorRampPalette(c("white", "blue"))(255)
+
+# 绘制热图
+heatmap.2(numeric_matrix,
+          Rowv = TRUE, Colv = TRUE,   
+          col = colors,
+          scale = "none",
+          margins = c(7, 12),
+          key = TRUE, keysize = 0.5,
+          density.info = "none",
+          reorderfun = function(d, w) reorder(d, w, agglo.FUN = mean),
+          trace = "none",
+          main = "聚类热图")
+
