@@ -1,0 +1,41 @@
+library(ggplot2)
+library(RColorBrewer)
+library(readxl)
+# 读取数据
+# 确定导入文件位置'C:/Users/86186/Desktop/PCA'和文件名字"PCA2.xlsx"
+setwd('C:/Users/86186/Desktop/PCA')
+data <- read_excel("PCA2.xlsx")
+# 检查数据结构，确保"sample"列包含貂颜色信息
+str(data)
+
+# 动态生成颜色（根据分组数量调整）
+num_groups <- length(unique(data$SAMPLE))
+colors <- colorRampPalette(brewer.pal(min(num_groups, 8), "Set2"))(num_groups)
+
+# 创建PCA图
+ggplot(data, aes(x = PC1, y = PC2, color = SAMPLE)) +
+  # 绘制散点图
+  geom_point(size = 4, alpha = 0.7) +
+  
+  # 设置标签和主题title和color需要修改
+  labs(
+    x = "PC1",
+    y = "PC2",
+    title = "PCA Plot by Mink Color",
+    color = "Mink Color"
+  ) +
+  
+  # 主题设置（SCI论文风格）
+  theme_bw() +
+  theme(
+    legend.title = element_text(size = 12, face = "bold"),
+    legend.text = element_text(size = 10),
+    axis.title = element_text(size = 14, face = "bold"),
+    axis.text = element_text(size = 12),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    panel.grid = element_blank(),
+    panel.border = element_rect(colour = "black", fill = NA, size = 1)
+  ) +
+  
+  # 设置颜色
+  scale_color_manual(values = colors)
